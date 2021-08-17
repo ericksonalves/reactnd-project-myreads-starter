@@ -33,27 +33,24 @@ class Search extends React.Component {
 
   handleOnBookshelfChanged = (book, shelf) => {
     BooksRepository.update(book, shelf)
-      .then(() => this.fetchData());
+      .then(() => this.searchData(this.state.query));
   };
 
   handleOnChange = (event) => {
     event.preventDefault();
     this.updateQuery(event.target.value);
+    this.searchData(event.target.value);
   };
 
-  handleOnKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      this.fetchData();
+  searchData(query) {
+    if (query.trim().length > 0) {
+      let searchedBooks = null;
+
+      BooksRepository.search(query.trim())
+        .then((books) => searchedBooks = books)
+        .then(() => BooksRepository.getAll())
+        .then((books) => this.applyStatuses(searchedBooks, books));
     }
-  };
-
-  fetchData() {
-    let searchedBooks = undefined;
-
-    BooksRepository.search(this.state.query)
-      .then((books) => searchedBooks = books)
-      .then(() => BooksRepository.getAll())
-      .then((books) => this.applyStatuses(searchedBooks, books));
   }
 
   updateBooks = (books) => {
@@ -78,7 +75,6 @@ class Search extends React.Component {
           <div className="search-books-input-wrapper">
             <input
               onChange={this.handleOnChange}
-              onKeyDown={this.handleOnKeyDown}
               type="text"
               placeholder="Search by title or author"
               value={this.state.query} />

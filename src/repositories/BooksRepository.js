@@ -20,16 +20,17 @@ export const update = (book, shelf) =>
 export const search = (query) =>
   BooksAPI.search(query)
   .then((rawBooks) =>
+    rawBooks && !rawBooks.error ?
     rawBooks.map(
       (rawBook) => toBook(rawBook)
-    )
+    ) : []
   )
 
 const toBook = (rawBook) =>
   new Book(
     StringUtils.join(rawBook.authors, ', '),
     rawBook.id,
-    rawBook.shelf !== undefined ? rawBook.shelf : 'none',
-    rawBook.imageLinks.thumbnail,
+    rawBook.shelf ? rawBook.shelf : 'none',
+    rawBook.imageLinks ? rawBook.imageLinks.thumbnail : '',
     rawBook.title
   );
