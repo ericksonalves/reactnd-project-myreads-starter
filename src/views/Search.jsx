@@ -40,11 +40,11 @@ class Search extends React.Component {
 
   handleOnBookshelfChanged = (book, shelf) => {
     let bookshelvesBooks = this.state.bookshelvesBooks;
+    book.status = shelf;
 
     if (BookUtils.anyMatchingId(bookshelvesBooks, book.getId())) {
       const previousBookshelvesBooks = bookshelvesBooks.filter(
         (bookshelvesBook) => bookshelvesBook.getId() !== book.getId());
-      book.status = shelf;
       bookshelvesBooks = [...previousBookshelvesBooks, book];
     } else {
       bookshelvesBooks = [...bookshelvesBooks, book];
