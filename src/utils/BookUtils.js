@@ -1,7 +1,5 @@
 export const anyMatchingId = (books, id) => {
-  const res = books.filter((book) => book.getId() === id).length;
-  console.log(res);
-  return res > 0;
+  return books.filter((book) => book.getId() === id).length > 0;
 };
 
 export const filterByStatus = (books, status) => {

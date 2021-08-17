@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import BookModel from '../models/Book';
 
 const BookshelfChanger = (props) => {
   const { book, onBookshelfChanged } = props;
@@ -20,6 +22,11 @@ const BookshelfChanger = (props) => {
       </select>
     </div>
   );
+};
+
+BookshelfChanger.propTypes = {
+  book: PropTypes.instanceOf(BookModel).isRequired,
+  onBookshelfChanged: PropTypes.func.isRequired
 };
 
 export default BookshelfChanger;

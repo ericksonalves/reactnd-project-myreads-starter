@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Book from '../components/Book';
 import * as BooksRepository from '../repositories/BooksRepository';
 import * as BookUtils from '../utils/BookUtils';
@@ -116,5 +117,9 @@ class Search extends React.Component {
     );
   }
 }
+
+Search.propTypes = {
+  onClose: PropTypes.func.isRequired
+};
 
 export default Search;
