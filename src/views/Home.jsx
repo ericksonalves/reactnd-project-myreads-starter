@@ -2,12 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Bookshelf from '../components/Bookshelf';
 import * as BooksRepository from '../repositories/BooksRepository';
+import * as BookUtils from '../utils/BookUtils';
 
 class Home extends React.Component {
   state = {
-    currentlyReadingBooks: [],
-    wantToReadBooks: [],
-    readBooks: []
+    books: []
   };
 
   componentDidMount() {
@@ -16,7 +15,7 @@ class Home extends React.Component {
 
   fetchData() {
     BooksRepository.getAll()
-      .then((books) => this.updateState(books));
+      .then((books) => this.updateBooks(books));
   }
 
   handleOnBookshelfChanged = (book, shelf) => {
@@ -24,15 +23,9 @@ class Home extends React.Component {
       .then(() => this.fetchData());
   };
 
-  updateState(books) {
-    const wantToReadBooks = books.filter((book) => book.status === 'wantToRead');
-    const currentlyReadingBooks = books.filter((book) => book.status === 'currentlyReading');
-    const readBooks = books.filter((book) => book.status === 'read');
-
+  updateBooks(books) {
     this.setState({
-      wantToReadBooks: wantToReadBooks,
-      currentlyReadingBooks: currentlyReadingBooks,
-      readBooks: readBooks
+      books: books
     });
   }
 
@@ -45,15 +38,15 @@ class Home extends React.Component {
         <div className="list-books-content">
           <div>
             <Bookshelf
-              books={this.state.currentlyReadingBooks}
+              books={BookUtils.filterByStatus(this.state.books, 'currentlyReading')}
               onBookshelfChanged={this.handleOnBookshelfChanged}
               title='Currently Reading' />
             <Bookshelf
-              books={this.state.wantToReadBooks}
+              books={BookUtils.filterByStatus(this.state.books, 'wantToRead')}
               onBookshelfChanged={this.handleOnBookshelfChanged}
               title='Want to Read' />
             <Bookshelf
-              books={this.state.readBooks}
+              books={BookUtils.filterByStatus(this.state.books, 'read')}
               onBookshelfChanged={this.handleOnBookshelfChanged}
               title='Read' />
           </div>
