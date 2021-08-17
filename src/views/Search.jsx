@@ -6,8 +6,14 @@ import * as BookUtils from '../utils/BookUtils';
 class Search extends React.Component {
   state = {
     books: [],
-    query: ''
+    query: '',
+    bookshelvesBooks: []
   };
+
+  componentDidMount() {
+    BooksRepository.getAll()
+      .then((books) => this.updateBookshelvesBooks(books));
+  }
 
   applyStatuses = (allBooks, bookshelvesBooks) => {
     const currentlyReading = BookUtils.filterByStatus(bookshelvesBooks, 'currentlyReading');
@@ -32,8 +38,20 @@ class Search extends React.Component {
   };
 
   handleOnBookshelfChanged = (book, shelf) => {
-    BooksRepository.update(book, shelf)
-      .then(() => this.searchData(this.state.query));
+    let bookshelvesBooks = this.state.bookshelvesBooks;
+
+    if (BookUtils.anyMatchingId(bookshelvesBooks, book.getId())) {
+      const previousBookshelvesBooks = bookshelvesBooks.filter(
+        (bookshelvesBook) => bookshelvesBook.getId() !== book.getId());
+      book.status = shelf;
+      bookshelvesBooks = [...previousBookshelvesBooks, book];
+    } else {
+      bookshelvesBooks = [...bookshelvesBooks, book];
+    }
+    this.updateBookshelvesBooks(bookshelvesBooks);
+
+    BooksRepository.update(book, shelf);
+    this.applyStatuses(this.state.books, bookshelvesBooks);
   };
 
   handleOnChange = (event) => {
@@ -44,12 +62,10 @@ class Search extends React.Component {
 
   searchData(query) {
     if (query.trim().length > 0) {
-      let searchedBooks = null;
-
       BooksRepository.search(query.trim())
-        .then((books) => searchedBooks = books)
-        .then(() => BooksRepository.getAll())
-        .then((books) => this.applyStatuses(searchedBooks, books));
+        .then((books) => this.applyStatuses(books, this.state.bookshelvesBooks));
+    } else {
+      this.updateBooks([]);
     }
   }
 
@@ -58,6 +74,12 @@ class Search extends React.Component {
       books: books
     });
   };
+
+  updateBookshelvesBooks = (books) => {
+    this.setState({
+      bookshelvesBooks: books
+    });
+  }
 
   updateQuery = (query) => {
     this.setState({
